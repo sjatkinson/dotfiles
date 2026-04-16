@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-old=`pwd`
-cd $(dirname $0)
-dot_dir=`pwd`
+if ! command -v stow &>/dev/null; then
+  echo "stow is required but not installed."
+  exit 1
+fi
 
-ln -s $dot_dir/dotfiles/tmux.conf $HOME/.tmux.conf
+PACKAGES=(
+  tmux
+  ghostty
+)
+
+for pkg in "${PACKAGES[@]}"; do
+  stow -d "$DOTFILES_DIR" -t "$HOME" "$pkg"
+  echo "  ✓ $pkg"
+done
